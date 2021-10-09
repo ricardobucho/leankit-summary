@@ -114,7 +114,7 @@
                     <tr>
                       <td class="text-center">
                         <a
-                          href="https://icn.leankit.com/card/<%= card[:id] %>"
+                          href="<%= card[:leankit_url] %>"
                           target="_blank"
                         >
                           <%= card[:header] %>
@@ -154,14 +154,23 @@
                                   <table class="table table-sm align-middle" style="zoom: .9">
                                     <thead>
                                       <tr>
+                                        <th style="width: 10px;">Header</th>
                                         <th style="width: 10px;">Weeks</th>
-                                        <th>Task</th>
+                                        <th>Title</th>
                                         <th class="text-center">Status</th>
                                       </tr>
                                     </thead>
                                     <tbody>
                                       <% card[:tasks].each do |task| %>
                                         <tr>
+                                          <td class="text-center">
+                                            <a
+                                              href="<%= task[:leankit_url] %>"
+                                              target="_blank"
+                                            >
+                                              <%= task[:header] %>
+                                            </a>
+                                          </td>
                                           <td class="text-center"><%= task[:weeks_stale] %></td>
                                           <td><%= task[:title] %></td>
                                           <td class="text-center" style="width: 100px">

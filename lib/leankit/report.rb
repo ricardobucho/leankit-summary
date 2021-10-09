@@ -99,6 +99,7 @@ module Leankit
       {
         id: card[:id],
         header: "#{card[:customId][:prefix]}#{card[:customId][:value]}",
+        leankit_url: "#{Config.get(:api_base_url)}/card/#{card[:id]}",
         title: card[:title],
         assignees: card[:assignedUsers].pluck(:fullName).join(', '),
         tasks: create_tasks_array(card),
@@ -118,6 +119,8 @@ module Leankit
     def create_task_hash(task)
       {
         id: task[:id],
+        header: "#{task[:customId][:prefix]}#{task[:customId][:value]}",
+        leankit_url: "#{Config.get(:api_base_url)}/card/#{task[:id]}",
         title: task[:title],
         assignees: task[:assignedUsers].pluck(:fullName).join(', '),
         status: task_status(task),
