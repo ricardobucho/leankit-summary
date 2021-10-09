@@ -7,7 +7,8 @@ class Config
         api_base_url: nil,
         api_token: nil,
         board_id: nil,
-        lanes: []
+        lanes: [],
+        include_task_cards: true
       }
 
       yield(@configuration)

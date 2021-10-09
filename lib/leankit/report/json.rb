@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Leankit
-  module Reports
+  class Report
     class Json
       def initialize(report)
         @report = report
@@ -9,8 +9,6 @@ module Leankit
 
       def perform
         @report.create(content, :json)
-
-        self
       end
 
       private

@@ -20,3 +20,9 @@ Metrics/BlockLength:
 
 Style/Documentation:
   Enabled: false
+
+Metrics/ClassLength:
+  Max: 200
+
+Layout/MultilineMethodCallIndentation:
+  Enabled: false

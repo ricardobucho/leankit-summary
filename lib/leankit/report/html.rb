@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Leankit
-  module Reports
+  class Report
     class Html
       def initialize(report)
         @report = report
@@ -22,6 +22,9 @@ module Leankit
         OpenStruct.new(
           {
             identifier: @report.identifier,
+            timestamp: @report.timestamp,
+            date: @report.timestamp.strftime('%B %-d, %Y'),
+            datetime: @report.timestamp.strftime('%B %-d, %Y @ %H:%M:%S'),
             **@report.data
           }
         ).instance_eval { binding }

@@ -15,10 +15,12 @@ module Leankit
     end
 
     def board
-      @board ||= format(get("io/board/#{Config.get(:board_id)}"))
+      format(get("io/board/#{Config.get(:board_id)}"))
     end
 
-    def lanes
+    def lanes(board)
+      return [] unless board.is_a?(Hash)
+
       config_lanes = Config.get(:lanes)
 
       board[:lanes].select do |lane|
@@ -30,12 +32,13 @@ module Leankit
     def cards(lane)
       return [] unless lane.is_a?(Hash)
 
-      @cards ||= {}
-      @cards[lane[:id]] ||= format(get('io/card', { lanes: lane[:id] }))[:cards]
+      format(get('io/card', { lanes: lane[:id] }))[:cards]
     end
 
     def tasks(card)
-      {}
+      return [] unless card.is_a?(Hash)
+
+      format(get("io/card/#{card[:id]}/tasks"))[:cards]
     end
 
     private
