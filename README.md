@@ -36,9 +36,11 @@ The HTML version will be launched automatically in your browser once it's ready.
 
 ## Execution Shortcuts
 Alternatively, you can use the included `bin/*` files to run a command directly without prepending `ruby` to it.
-1. First allow them to be executed with `chmod +x ./bin/*`
-2. Then simply execute them as `./bin/{name}`
-It's important that all calls to either `apps/*` or `bin/*` originate in their parent directory otherwise execution fails!
+
+1. First allow them to be executed with `$ chmod +x ./bin/*`
+2. Then simply execute them as `$ ./bin/{name}`
+
+When executing from either `apps/*` or `bin/*` make sure you're on the parent directory, otherwise execution fails.
 
 ## Alias
 ```bash
