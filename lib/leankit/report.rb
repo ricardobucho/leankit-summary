@@ -10,7 +10,8 @@ module Leankit
     STATUS_LABELS = {
       not_started: 'Not Started',
       started: 'Started',
-      finished: 'Finished'
+      finished: 'Finished',
+      unknown: 'Unknown'
     }.freeze
 
     STATUS = {
