@@ -1,7 +1,7 @@
 # LeanKit Summary
 Generate summary reports for LeanKit boards.
 
-![Preview](https://github.com/ricardobucho/leankit-summary/blob/main/preview.png?raw=true)
+![Preview](https://github.com/ricardobucho/leankit-summary/blob/main/html-report-preview.png?raw=true)
 
 ## Requirements
 * Ruby 2.6.6 (working on 3.0.1, untested with other versions)
