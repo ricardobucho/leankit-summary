@@ -59,6 +59,7 @@ GEM
     zeitwerk (2.4.2)
 
 PLATFORMS
+  x86_64-darwin-19
   x86_64-darwin-20
 
 DEPENDENCIES
@@ -74,4 +75,4 @@ DEPENDENCIES
   zeitwerk (= 2.4.2)
 
 BUNDLED WITH
-   2.2.3
+   2.2.20
