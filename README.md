@@ -27,9 +27,15 @@ Generate summary reports for LeanKit boards.
 To fill in `LK_LANES` you can either use the id or name of the lane.
 If there are multilple lanes with the same name they will all be included.
 In such cases you might need to use the id instead.
-Running `ruby lanes.rb` will show you the list of lanes for the board.
+Running `ruby ./app/lanes.rb` will show you the list of lanes for the board.
 From there, pick the ones you need and add them to the environment variable.
 
 ## Generating the Reports
-Running `ruby report.rb` will generate a json and an html report that will be saved in the `reports` directory.
+Running `ruby ./app/report.rb` will generate a json and an html report that will be saved in the `reports` directory.
 The HTML version will be launched automatically in your browser once it's ready.
+
+## Execution Shortcuts
+Alternatively, you can use the included `bin/*` files to run a command directly without prepending `ruby` to it.
+1. First allow them to be executed with `chmod +x ./bin/*`
+2. Then simply execute them as `./bin/{name}`
+It's important that all calls to either `apps/*` or `bin/*` originate in their parent directory otherwise execution fails!

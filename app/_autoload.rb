@@ -7,7 +7,6 @@ Bundler.require
 Dotenv.load
 
 loader = Zeitwerk::Loader.new
-loader.enable_reloading
 loader.push_dir('lib')
 loader.setup
 
