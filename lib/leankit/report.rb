@@ -25,7 +25,6 @@ module Leankit
       @timestamp = Time.now
       @identifier = @timestamp.strftime('%Y%m%dT%H%M%S')
       @performed = false
-
       @data = {}
     end
 

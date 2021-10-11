@@ -31,10 +31,10 @@ class LaneViewer
   end
 
   def title
-    "Showing all available lanes in order for board #{board[:title]}"
+    @title ||= "Showing all available lanes in order for board #{board[:title]}"
   end
 
   def separator
-    puts '-' * title.length
+    puts @separator ||= '-' * title.length
   end
 end

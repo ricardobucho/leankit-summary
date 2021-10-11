@@ -18,7 +18,7 @@ class Config
       @configuration[key]
     end
 
-    def preflight_check
+    def preflight
       @configuration.each do |(key, value)|
         if value.blank?
           puts "", "!! There is no configured value for `#{key}`.", ""

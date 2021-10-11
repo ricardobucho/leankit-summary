@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
-load 'initializer.rb'
+require_relative '_autoload'
 
 LaneViewer.new.perform
