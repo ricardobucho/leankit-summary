@@ -58,6 +58,7 @@ module Leankit
 
     def create(content, type)
       File.open(filename(type), 'w+') { |file| file.write(content) }
+      puts "Report file `#{filename(type)}` has been generated."
     end
 
     def create_json_report

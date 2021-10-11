@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class App
+class Reporter
   def perform
     @report = Leankit::Report.new
 

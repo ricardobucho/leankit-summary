@@ -19,4 +19,4 @@ Config.set do |config|
   config[:include_task_cards] = ENV['INCLUDE_TASK_CARDS'].to_s.downcase == 'true'
 end
 
-App.new.perform
+Config.preflight_check

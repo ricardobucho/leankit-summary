@@ -17,5 +17,14 @@ class Config
     def get(key)
       @configuration[key]
     end
+
+    def preflight_check
+      @configuration.each do |(key, value)|
+        if value.blank?
+          puts "", "!! There is no configured value for `#{key}`.", ""
+          exit
+        end
+      end
+    end
   end
 end
