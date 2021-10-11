@@ -39,3 +39,10 @@ Alternatively, you can use the included `bin/*` files to run a command directly 
 1. First allow them to be executed with `chmod +x ./bin/*`
 2. Then simply execute them as `./bin/{name}`
 It's important that all calls to either `apps/*` or `bin/*` originate in their parent directory otherwise execution fails!
+
+## Alias
+```bash
+# LeanKit Summary
+alias lk_report="(cd ~/.../leankit-summary && ./bin/report)"
+alias lk_lanes="(cd ~/.../leankit-summary && ./bin/lanes)"
+```
