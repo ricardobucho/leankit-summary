@@ -101,7 +101,7 @@ module Leankit
         id: card[:id],
         header: "#{card[:customId][:prefix]}#{card[:customId][:value]}",
         leankit_url: "#{Config.get(:api_base_url)}/card/#{card[:id]}",
-        title: card[:title],
+        title: CGI::escapeHTML(card[:title]),
         assignees: card[:assignedUsers].pluck(:fullName).join(', '),
         tasks: create_tasks_array(card),
         weeks_stale: weeks_stale(card)
