@@ -9,8 +9,8 @@ module Leankit
 
       def perform
         @report.create(parsed, :html)
-        exec "open ./#{@report.class::REPORTS_DIRECTORY}"
         Launchy.open(@report.filename(:html))
+        exec "open ./#{@report.class::REPORTS_DIRECTORY}"
       end
 
       private

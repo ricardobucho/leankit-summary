@@ -8,6 +8,9 @@ class Config
         api_token: nil,
         board_id: nil,
         lanes: [],
+        github_api_base_url: nil,
+        github_token: nil,
+        github_repository: nil,
         include_task_cards: true
       }
 
@@ -20,8 +23,8 @@ class Config
 
     def preflight
       @configuration.each do |(key, value)|
-        if value.blank?
-          puts "", "!! There is no configured value for `#{key}`.", ""
+        if value.to_s.squish.blank?
+          puts '', "!! There is no configured value for `#{key}`.", ''
           exit
         end
       end

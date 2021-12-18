@@ -21,6 +21,13 @@ module Leankit
       unknown: { order: 1, label: STATUS_LABELS[:unknown], style: 'warning' }
     }.freeze
 
+    PR_STATUS = {
+      open: { style: 'success' },
+      closed: { style: 'danger' },
+      merged: { style: 'dark' },
+      draft: { style: 'muted' }
+    }.freeze
+
     def initialize
       @timestamp = Time.now
       @identifier = @timestamp.strftime('%Y%m%dT%H%M%S')
@@ -97,14 +104,17 @@ module Leankit
     end
 
     def create_card_hash(card)
+      header = "#{card[:customId][:prefix]}#{card[:customId][:value]}"
+
       {
         id: card[:id],
-        header: "#{card[:customId][:prefix]}#{card[:customId][:value]}",
+        header: header,
         leankit_url: "#{Config.get(:api_base_url)}/card/#{card[:id]}",
         title: CGI::escapeHTML(card[:title]),
         assignees: card[:assignedUsers].pluck(:fullName).join(', '),
         tasks: create_tasks_array(card),
-        weeks_stale: weeks_stale(card)
+        weeks_stale: weeks_stale(card),
+        pull_request: pull_request(header)
       }
     end
 
@@ -118,14 +128,17 @@ module Leankit
     end
 
     def create_task_hash(task)
+      header = "#{task[:customId][:prefix]}#{task[:customId][:value]}"
+
       {
         id: task[:id],
-        header: "#{task[:customId][:prefix]}#{task[:customId][:value]}",
+        header: header,
         leankit_url: "#{Config.get(:api_base_url)}/card/#{task[:id]}",
         title: task[:title],
         assignees: task[:assignedUsers].pluck(:fullName).join(', '),
         status: task_status(task),
-        weeks_stale: task_weeks_stale(task)
+        weeks_stale: task_weeks_stale(task),
+        pull_request: pull_request(header)
       }
     end
 
@@ -148,6 +161,44 @@ module Leankit
 
     def task_weeks_stale(task)
       task_status(task)[:label] == STATUS_LABELS[:started] ? weeks_stale(task) : '-'
+    end
+
+    def pull_request(header)
+      return unless Config.get(:include_pull_requests).presence
+
+      response = Github::Api.pull_request(header)
+
+      pull_request =
+        response[:nodes].reject do |pr|
+          pr[:state] == 'CLOSED' && pr[:closed]
+        end.first
+
+      return pull_request_hash(pull_request) if
+        response.is_a?(Hash) &&
+        response[:issueCount].positive?
+
+      nil
+    end
+
+    def pull_request_hash(pull_request)
+      return {} if pull_request.blank?
+
+      {
+        number: pull_request[:number],
+        url: pull_request[:url],
+        closed: pull_request[:closed],
+        draft: pull_request[:isDraft],
+        state: pull_request[:state],
+        status: pull_request_status(pull_request)
+      }
+    end
+
+    def pull_request_status(pull_request)
+      return PR_STATUS[:merged] if pull_request[:state] == 'MERGED'
+      return PR_STATUS[:closed] if pull_request[:state] == 'CLOSED' && pull_request[:closed]
+      return PR_STATUS[:draft] if pull_request[:isDraft]
+
+      PR_STATUS[:open]
     end
   end
 end

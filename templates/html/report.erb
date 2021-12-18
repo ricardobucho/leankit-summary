@@ -100,7 +100,8 @@
                 <table class="table align-middle">
                   <thead>
                     <tr>
-                      <th style="width: 10px">Header</th>
+                      <th style="width: 100px" class="text-center">Header</th>
+                      <th style="width: 100px" class="text-center">PR</th>
                       <th style="width: 10px">Weeks</th>
                       <th style="width: 10px">Tasks</th>
                       <th>Title</th>
@@ -114,12 +115,37 @@
                       <% tasksModalTarget = "tasks-#{card[:id]}-modal" %>
                       <tr>
                         <td class="text-center">
+                          <i
+                            data-feather="hash"
+                            width="14px"
+                            height="14px"
+                            style="position: relative; top: -3px"
+                          ></i>
                           <a
                             href="<%= card[:leankit_url] %>"
                             target="_blank"
                           >
                             <%= card[:header] %>
                           </a>
+                        </td>
+                        <td class="text-center">
+                          <% if card[:pull_request].present? %>
+                            <i
+                              data-feather="git-pull-request"
+                              width="14px"
+                              height="14px"
+                              style="position: relative; top: -3px"
+                              class="text-<%= card[:pull_request][:status][:style] %>"
+                            ></i>
+                            <a
+                              href="<%= card[:pull_request][:url] %>"
+                              target="_blank"
+                            >
+                              <%= card[:pull_request][:number] %>
+                            </a>
+                          <% else %>
+                            -
+                          <% end %>
                         </td>
                         <td class="text-center"><%= card[:weeks_stale] %></td>
                         <td>
@@ -135,7 +161,7 @@
                             >
                               <%= tasks.size %>
                             </button>
-                            <!-- End Tasks Modal Button-->
+                            <!-- End Tasks Modal Button -->
 
                             <!-- Tasks Modal -->
                             <div
@@ -155,7 +181,8 @@
                                     <table class="table table-sm align-middle" style="zoom: .9">
                                       <thead>
                                         <tr>
-                                          <th style="width: 10px;">Header</th>
+                                          <th style="width: 100px;" class="text-center">Header</th>
+                                          <th style="width: 100px;" class="text-center">PR</th>
                                           <th style="width: 10px;">Weeks</th>
                                           <th>Title</th>
                                           <th class="text-center">Status</th>
@@ -165,12 +192,37 @@
                                         <% card[:tasks].each do |task| %>
                                           <tr>
                                             <td class="text-center">
+                                              <i
+                                                data-feather="hash"
+                                                width="14px"
+                                                height="14px"
+                                                style="position: relative; top: -3px"
+                                              ></i>
                                               <a
                                                 href="<%= task[:leankit_url] %>"
                                                 target="_blank"
                                               >
                                                 <%= task[:header] %>
                                               </a>
+                                            </td>
+                                            <td class="text-center">
+                                              <% if task[:pull_request].present? %>
+                                                <i
+                                                  data-feather="git-pull-request"
+                                                  width="14px"
+                                                  height="14px"
+                                                  style="position: relative; top: -3px"
+                                                  class="text-<%= task[:pull_request][:status][:style] %>"
+                                                ></i>
+                                                <a
+                                                  href="<%= task[:pull_request][:url] %>"
+                                                  target="_blank"
+                                                >
+                                                  <%= task[:pull_request][:number] %>
+                                                </a>
+                                              <% else %>
+                                                -
+                                              <% end %>
                                             </td>
                                             <td class="text-center"><%= task[:weeks_stale] %></td>
                                             <td><%= task[:title] %></td>
