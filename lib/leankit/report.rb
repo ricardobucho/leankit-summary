@@ -121,10 +121,10 @@ module Leankit
     end
 
     def create_task_hash(task)
-      header = "#{card[:customId][:prefix]}#{card[:customId][:value]}"
+      header = "#{task[:customId][:prefix]}#{task[:customId][:value]}"
 
       {
-        id: card[:id],
+        id: task[:id],
         header: header,
         leankit_url: "#{Config.get(:api_base_url)}/card/#{task[:id]}",
         title: task[:title],
@@ -159,9 +159,9 @@ module Leankit
     def pull_request(header)
       request = Github::Api.pull_request(header)
 
-      return pull_request_data(request[:items].first) if
+      return pull_request_data(request[:nodes].first) if
         request.is_a?(Hash) &&
-        request[:total_count].positive?
+        request[:issueCount].positive?
 
       nil
     end
@@ -171,8 +171,9 @@ module Leankit
 
       {
         number: pull_request_item[:number],
-        url: pull_request_item[:pull_request][:html_url],
-        draft: pull_request_item[:draft],
+        url: pull_request_item[:url],
+        closed: pull_request_item[:closed],
+        draft: pull_request_item[:isDraft],
         state: pull_request_item[:state]
       }
     end
