@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module Github
+  # GraphQL Explorer
+  # https://docs.github.com/en/graphql/overview/explorer
   class Api
     include Singleton
 
@@ -16,10 +18,28 @@ module Github
 
     def pull_request(title)
       format(
-        get('search/issues', {
-          q: "#{title} in:title type:pr repo:#{Config.get(:github_repository)}"
-        })
-      )
+        graphql(
+          <<-QUERY.squish
+            {
+              search(query: "#{title} is:pr in:title repo:#{Config.get(:github_repository)}", type: ISSUE, first: 3) {
+                issueCount
+                nodes {
+                  ... on PullRequest {
+                    id
+                    url
+                    number
+                    state
+                    title
+                    updatedAt
+                    closed
+                    isDraft
+                  }
+                }
+              }
+            }
+          QUERY
+        )
+      )[:data][:search]
     end
 
     private
@@ -35,24 +55,23 @@ module Github
     end
 
     def format(value)
-      return value unless
-        value.is_a?(HTTParty::Response) ||
-        value.is_a?(Hash)
+      return JSON.parse(value, symbolize_names: true) if
+        value.is_a?(String)
 
-      value.deep_symbolize_keys
+      value
     end
 
-    def get(path, query = {})
+    def graphql(query = '{}')
       return unless preflight?
 
-      HTTParty.get(
-        "#{Config.get(:github_api_base_url)}/#{path}",
+      HTTParty.post(
+        "#{Config.get(:github_api_base_url)}/graphql",
         headers: {
           Accept: 'application/vnd.github.v3+json',
           Authorization: "Bearer #{Config.get(:github_token)}"
         },
-        query: query
-      )
+        body: { query: query, variables: {} }.to_json
+      ).body
     end
   end
 end
