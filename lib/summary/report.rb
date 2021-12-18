@@ -29,6 +29,7 @@ module Summary
     }.freeze
 
     def initialize
+      @headers = {}
       @timestamp = Time.now
       @identifier = @timestamp.strftime('%Y%m%dT%H%M%S')
       @performed = false
@@ -43,6 +44,10 @@ module Summary
       @performed = true
 
       self
+    end
+
+    def logger
+      @logger ||= Summary::Logger.instance
     end
 
     def performed?
@@ -65,7 +70,7 @@ module Summary
 
     def create(content, type)
       File.open(filename(type), 'w+') { |file| file.write(content) }
-      puts "Report file `#{filename(type)}` has been generated."
+      logger.success(">> Report file (#{type}) `#{filename(type)}` has been generated.")
     end
 
     def create_json_report
@@ -84,7 +89,16 @@ module Summary
     end
 
     def create_lanes_array(board)
-      Leankit::Api.lanes(board).map { |lane| create_lane_hash(lane) }
+      lanes = Leankit::Api.lanes(board)
+      threads = []
+
+      logger.group_start("Processing lanes: #{lanes.pluck(:name).join(', ')}")
+
+      lanes.each { |lane| threads << Thread.new { create_lane_hash(lane) } }
+
+      logger.group_end
+
+      threads.map { |thread| thread.join && thread.value }
     end
 
     def create_lane_hash(lane)
@@ -96,25 +110,23 @@ module Summary
     end
 
     def create_cards_array(lane)
-      Leankit::Api
-        .cards(lane)
-        .map { |card| create_card_hash(card) }
+      Leankit::Api.cards(lane)
+        .map { |card| create_log_entry(card) }
+        .map { |card| create_hash(card, :card) }
         .sort_by { |hash| hash[:weeks_stale] }
         .reverse
     end
 
     def create_card_hash(card)
-      header = "#{card[:customId][:prefix]}#{card[:customId][:value]}"
-
       {
         id: card[:id],
-        header: header,
+        header: header(card),
         leankit_url: "#{Config.get(:api_base_url)}/card/#{card[:id]}",
         title: CGI.escapeHTML(card[:title]),
         assignees: card[:assignedUsers].pluck(:fullName).join(', '),
         tasks: create_tasks_array(card),
         weeks_stale: weeks_stale(card),
-        pull_request: pull_request(header)
+        pull_request: pull_request(card)
       }
     end
 
@@ -122,24 +134,38 @@ module Summary
       return [] unless Config.get(:include_task_cards).presence
 
       Leankit::Api.tasks(card)
-        .map { |task| create_task_hash(task) }
+        .map { |task| create_log_entry(task) }
+        .map { |task| create_hash(task, :task) }
         .sort_by { |hash| [hash[:status][:order], hash[:weeks_stale], hash[:movedOn]] }
         .reverse
     end
 
     def create_task_hash(task)
-      header = "#{task[:customId][:prefix]}#{task[:customId][:value]}"
-
       {
         id: task[:id],
-        header: header,
+        header: header(task),
         leankit_url: "#{Config.get(:api_base_url)}/card/#{task[:id]}",
         title: task[:title],
         assignees: task[:assignedUsers].pluck(:fullName).join(', '),
         status: task_status(task),
         weeks_stale: task_weeks_stale(task),
-        pull_request: pull_request(header)
+        pull_request: pull_request(task)
       }
+    end
+
+    def create_log_entry(item)
+      logger.item_start(item[:id], header(item))
+      item
+    end
+
+    def create_hash(item, type = :card)
+      send("create_#{type}_hash", item).tap do |hash|
+        logger.item_end(hash[:id])
+      end
+    end
+
+    def header(card)
+      @headers[card[:id]] ||= "#{card[:customId][:prefix]}#{card[:customId][:value]}"
     end
 
     def weeks_stale(card)
@@ -163,10 +189,10 @@ module Summary
       task_status(task)[:label] == STATUS_LABELS[:started] ? weeks_stale(task) : '-'
     end
 
-    def pull_request(header)
+    def pull_request(card)
       return unless Config.get(:include_pull_requests).presence
 
-      response = Github::Api.pull_request(header)
+      response = Github::Api.pull_request(header(card))
 
       pull_request =
         response[:nodes].reject do |pr|
