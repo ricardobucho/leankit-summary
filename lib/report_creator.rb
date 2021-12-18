@@ -2,7 +2,7 @@
 
 class ReportCreator
   def initialize
-    @report = Leankit::Report.new
+    @report = Summary::Report.new
   end
 
   def perform

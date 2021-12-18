@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Leankit
+module Summary
   class Report
     attr_reader :timestamp, :identifier, :performed
 
@@ -69,11 +69,11 @@ module Leankit
     end
 
     def create_json_report
-      Leankit::Report::Json.new(self).perform
+      Summary::Report::Json.new(self).perform
     end
 
     def create_html_report
-      Leankit::Report::Html.new(self).perform
+      Summary::Report::Html.new(self).perform
     end
 
     private
@@ -110,7 +110,7 @@ module Leankit
         id: card[:id],
         header: header,
         leankit_url: "#{Config.get(:api_base_url)}/card/#{card[:id]}",
-        title: CGI::escapeHTML(card[:title]),
+        title: CGI.escapeHTML(card[:title]),
         assignees: card[:assignedUsers].pluck(:fullName).join(', '),
         tasks: create_tasks_array(card),
         weeks_stale: weeks_stale(card),
