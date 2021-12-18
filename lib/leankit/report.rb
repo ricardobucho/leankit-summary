@@ -21,6 +21,13 @@ module Leankit
       unknown: { order: 1, label: STATUS_LABELS[:unknown], style: 'warning' }
     }.freeze
 
+    PR_STATUS = {
+      open: { style: 'success' },
+      closed: { style: 'danger' },
+      merged: { style: 'dark' },
+      draft: { style: 'muted' }
+    }.freeze
+
     def initialize
       @timestamp = Time.now
       @identifier = @timestamp.strftime('%Y%m%dT%H%M%S')
@@ -157,25 +164,41 @@ module Leankit
     end
 
     def pull_request(header)
-      request = Github::Api.pull_request(header)
+      return unless Config.get(:include_pull_requests).presence
 
-      return pull_request_data(request[:nodes].first) if
-        request.is_a?(Hash) &&
-        request[:issueCount].positive?
+      response = Github::Api.pull_request(header)
+
+      pull_request =
+        response[:nodes].reject do |pr|
+          pr[:state] == 'CLOSED' && pr[:closed]
+        end.first
+
+      return pull_request_hash(pull_request) if
+        response.is_a?(Hash) &&
+        response[:issueCount].positive?
 
       nil
     end
 
-    def pull_request_data(pull_request_item)
-      return {} if pull_request_item.blank?
+    def pull_request_hash(pull_request)
+      return {} if pull_request.blank?
 
       {
-        number: pull_request_item[:number],
-        url: pull_request_item[:url],
-        closed: pull_request_item[:closed],
-        draft: pull_request_item[:isDraft],
-        state: pull_request_item[:state]
+        number: pull_request[:number],
+        url: pull_request[:url],
+        closed: pull_request[:closed],
+        draft: pull_request[:isDraft],
+        state: pull_request[:state],
+        status: pull_request_status(pull_request)
       }
+    end
+
+    def pull_request_status(pull_request)
+      return PR_STATUS[:merged] if pull_request[:state] == 'MERGED'
+      return PR_STATUS[:closed] if pull_request[:state] == 'CLOSED' && pull_request[:closed]
+      return PR_STATUS[:draft] if pull_request[:isDraft]
+
+      PR_STATUS[:open]
     end
   end
 end

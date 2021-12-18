@@ -135,6 +135,7 @@
                               width="14px"
                               height="14px"
                               style="position: relative; top: -3px"
+                              class="text-<%= card[:pull_request][:status][:style] %>"
                             ></i>
                             <a
                               href="<%= card[:pull_request][:url] %>"
@@ -211,6 +212,7 @@
                                                   width="14px"
                                                   height="14px"
                                                   style="position: relative; top: -3px"
+                                                  class="text-<%= task[:pull_request][:status][:style] %>"
                                                 ></i>
                                                 <a
                                                   href="<%= task[:pull_request][:url] %>"
