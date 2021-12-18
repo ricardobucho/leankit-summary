@@ -97,14 +97,17 @@ module Leankit
     end
 
     def create_card_hash(card)
+      header = "#{card[:customId][:prefix]}#{card[:customId][:value]}"
+
       {
         id: card[:id],
-        header: "#{card[:customId][:prefix]}#{card[:customId][:value]}",
+        header: header,
         leankit_url: "#{Config.get(:api_base_url)}/card/#{card[:id]}",
         title: CGI::escapeHTML(card[:title]),
         assignees: card[:assignedUsers].pluck(:fullName).join(', '),
         tasks: create_tasks_array(card),
-        weeks_stale: weeks_stale(card)
+        weeks_stale: weeks_stale(card),
+        pull_request: pull_request(header)
       }
     end
 
@@ -118,14 +121,17 @@ module Leankit
     end
 
     def create_task_hash(task)
+      header = "#{card[:customId][:prefix]}#{card[:customId][:value]}"
+
       {
-        id: task[:id],
-        header: "#{task[:customId][:prefix]}#{task[:customId][:value]}",
+        id: card[:id],
+        header: header,
         leankit_url: "#{Config.get(:api_base_url)}/card/#{task[:id]}",
         title: task[:title],
         assignees: task[:assignedUsers].pluck(:fullName).join(', '),
         status: task_status(task),
-        weeks_stale: task_weeks_stale(task)
+        weeks_stale: task_weeks_stale(task),
+        pull_request: pull_request(header)
       }
     end
 
@@ -148,6 +154,27 @@ module Leankit
 
     def task_weeks_stale(task)
       task_status(task)[:label] == STATUS_LABELS[:started] ? weeks_stale(task) : '-'
+    end
+
+    def pull_request(header)
+      request = Github::Api.pull_request(header)
+
+      return pull_request_data(request[:items].first) if
+        request.is_a?(Hash) &&
+        request[:total_count].positive?
+
+      nil
+    end
+
+    def pull_request_data(pull_request_item)
+      return {} if pull_request_item.blank?
+
+      {
+        number: pull_request_item[:number],
+        url: pull_request_item[:pull_request][:html_url],
+        draft: pull_request_item[:draft],
+        state: pull_request_item[:state]
+      }
     end
   end
 end
