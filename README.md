@@ -35,7 +35,7 @@ Generate summary reports for LeanKit boards.
 ## Generating a GitHub Personal Token
 
 1. After logging in to GitHub go to `Seetings`.
-2. Then head to `Develpper Settings` and `Personal Access Tokens`.
+2. Then head to `Developer Settings` and `Personal Access Tokens`.
 3. Generate a token with full `repo` access and give it a name and expiration as you see fit.
 4. Copy the generated token into the `GH_PERSONAL_TOKEN` env.
 
