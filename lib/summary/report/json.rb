@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Leankit
+module Summary
   class Report
     class Json
       def initialize(report)

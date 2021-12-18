@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Leankit
+module Summary
   class Report
     class Html
       def initialize(report)
