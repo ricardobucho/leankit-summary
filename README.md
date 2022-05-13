@@ -25,6 +25,9 @@ Generate summary reports for LeanKit boards.
 * `GH_REPOSITORY`: The repository where to search for pull requests in the `owner/repo` format
 * `INCLUDE_TASK_CARDS`: If the report should include task cards data
 * `INCLUDE_PULL_REQUESTS`: If the report should include pull request data
+* `USE_JSON_REPORT`: If a json report should be generated
+* `USE_LEGACY_REPORT`: If an html report should be generated using the legacy template
+* `USE_EVOLVED_REPORT`: If an html report should be generated using the evolved template
 
 ## Generating a LeanKit API Token
 

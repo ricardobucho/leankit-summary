@@ -60,25 +60,30 @@ module Summary
       @data
     end
 
-    def filename(type)
-      "#{REPORTS_DIRECTORY}/#{@identifier}.#{type}"
+    def filename(type, extension)
+      ending = type == extension ? extension : "#{type}.#{extension}"
+      "#{REPORTS_DIRECTORY}/#{@identifier}.#{ending}"
     end
 
     def template(type)
       File.read("#{TEMPLATES_DIRECTORY}/#{type}/report.erb")
     end
 
-    def create(content, type)
-      File.open(filename(type), 'w+') { |file| file.write(content) }
-      logger.success(">> Report file (#{type}) `#{filename(type)}` has been generated.")
+    def create(content, type, extension)
+      File.open(filename(type, extension), 'w+') { |file| file.write(content) }
+      logger.success(">> Report file (#{type}) `#{filename(type, extension)}` has been generated.")
     end
 
     def create_json_report
       Summary::Report::Json.new(self).perform
     end
 
-    def create_html_report
-      Summary::Report::Html.new(self).perform
+    def create_legacy_report
+      Summary::Report::Legacy.new(self).perform
+    end
+
+    def create_evolved_report
+      Summary::Report::Evolved.new(self).perform
     end
 
     private

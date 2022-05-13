@@ -5,10 +5,12 @@ module Summary
     class Json
       def initialize(report)
         @report = report
+        @type = :json
+        @extension = :json
       end
 
       def perform
-        @report.create(content, :json)
+        @report.create(content, @type, @extension)
       end
 
       private

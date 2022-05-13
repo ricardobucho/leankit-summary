@@ -2,21 +2,23 @@
 
 module Summary
   class Report
-    class Html
+    class Evolved
       def initialize(report)
         @report = report
+        @type = :evolved
+        @extension = :html
       end
 
       def perform
-        @report.create(parsed, :html)
-        Launchy.open(@report.filename(:html))
-        exec "open ./#{@report.class::REPORTS_DIRECTORY}"
+        @report.create(parsed, @type, @extension)
+        Launchy.open(@report.filename(@type, @extension))
+        `open ./#{@report.class::REPORTS_DIRECTORY}`
       end
 
       private
 
       def parsed
-        ERB.new(@report.template(:html)).result(content)
+        ERB.new(@report.template(@type)).result(content)
       end
 
       def content
