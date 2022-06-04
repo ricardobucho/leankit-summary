@@ -8,6 +8,7 @@ class Config
         api_token: nil,
         board_id: nil,
         lanes: [],
+        development_lane: nil,
         github_api_base_url: nil,
         github_token: nil,
         github_repository: nil,

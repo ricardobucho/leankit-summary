@@ -12,9 +12,23 @@
     crossorigin="anonymous"
   />
 
+  <link
+    href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css"
+    rel="stylesheet"
+  />
+
   <style media="all">
     main { padding-bottom: 3rem; }
     table > tbody > tr:last-child > td { border-bottom: none; }
+
+    th[data-sortable] { cursor: pointer; }
+    th[data-sortable] i { display: none; }
+
+    th[data-sortable="asc"] .feather-chevrons-up { display: inline-block; }
+    th[data-sortable="asc"] .feather-chevrons-down { display: none; }
+
+    th[data-sortable="desc"] .feather-chevrons-up { display: none; }
+    th[data-sortable="desc"] .feather-chevrons-down { display: inline-block; }
 
     .tab-content {
       padding: 10px 10px 0;
@@ -130,12 +144,55 @@
             aria-labelledby="<%= collapsible %>-tab"
           >
             <!-- Cards Table -->
-            <table class="table align-middle" data-tracker="tracker-<%= heading %>">
+            <table class="table align-middle report" data-tracker="tracker-<%= heading %>">
               <thead>
                 <tr>
                   <th style="width: 100px" class="text-center">Card</th>
                   <th style="width: 100px" class="text-center">PR</th>
-                  <th style="width: 10px">Weeks</th>
+
+                  <% if Config.get(:development_lane).presence %>
+                    <th
+                      class="text-center"
+                      style="width: 110px"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="top"
+                      title="Total Weeks in Development"
+                      data-sortable="desc"
+                    >
+                      Weeks (D)
+                      <i
+                        data-feather="chevrons-up"
+                        width="10px"
+                        height="10px"
+                      ></i>
+                      <i
+                        data-feather="chevrons-down"
+                        width="10px"
+                        height="10px"
+                      ></i>
+                    </th>
+                  <% end %>
+
+                  <th
+                    class="text-center"
+                    style="width: 110px"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    title="Weeks Since Last Move"
+                    data-sortable="desc"
+                  >
+                    Weeks (L)
+                    <i
+                      data-feather="chevrons-up"
+                      width="10px"
+                      height="10px"
+                    ></i>
+                    <i
+                      data-feather="chevrons-down"
+                      width="10px"
+                      height="10px"
+                    ></i>
+                  </th>
                   <th style="width: 10px">Tasks</th>
                   <th>Title</th>
                   <th style="width: 300px">Assignees</th>
@@ -180,7 +237,16 @@
                         -
                       <% end %>
                     </td>
-                    <td class="text-center"><%= card[:weeks_stale] %></td>
+
+                    <% if Config.get(:development_lane).presence %>
+                      <td class="text-center">
+                        <%= card[:development_weeks] %>
+                      </td>
+                    <% end %>
+
+                    <td class="text-center">
+                      <%= card[:weeks_stale] %>
+                    </td>
                     <td>
                       <!-- Tasks -->
                       <% if tasks.size > 0 %>
@@ -314,7 +380,7 @@
     </div>
   </footer>
 
-  <script src="https://unpkg.com/feather-icons"></script>
+  <script src="https://unpkg.com/feather-icons@4.29.0/dist/feather.min.js"></script>
 
   <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js"
@@ -376,6 +442,56 @@
     };
 
     enableSearching();
+  </script>
+
+  <script>
+    $reportTable = document.querySelectorAll('.report')[0];
+    $sortableColumns = $reportTable.querySelectorAll('th[data-sortable]');
+
+    $sortableColumns.forEach(function ($column) {
+      $column.addEventListener('click', function (e) {
+        let $sortableColumn = e.target;
+        let $sortableColumnsRows = $reportTable.querySelectorAll('tbody > tr.card-row');
+        let $sortableColumnsRowsArray = Array.from($sortableColumnsRows);
+
+        let currentSortableDirection = $sortableColumn.dataset.sortable;
+
+        let $sortableColumnsRowsArraySorted = $sortableColumnsRowsArray.sort(
+          function (a, b) {
+            let $a = parseInt(a.querySelectorAll('td')[$sortableColumn.cellIndex].innerText);
+            let $b = parseInt(b.querySelectorAll('td')[$sortableColumn.cellIndex].innerText);
+
+            if (currentSortableDirection === 'desc') {
+              if ($a > $b) {
+                return 1;
+              } else if ($a < $b) {
+                return -1;
+              } else {
+                return 0;
+              }
+            } else {
+              if ($a > $b) {
+                return -1;
+              } else if ($a < $b) {
+                return 1;
+              } else {
+                return 0;
+              }
+            }
+          }
+        );
+
+        $sortableColumns.forEach(function ($column) {
+          $column.dataset.sortable = 'asc';
+        });
+
+        $sortableColumn.dataset.sortable = currentSortableDirection === 'asc' ? 'desc' : 'asc';
+
+        $sortableColumnsRowsArraySorted.forEach(function ($row) {
+          $row.parentNode.appendChild($row);
+        });
+      });
+    });
   </script>
 </body>
 </html>

@@ -41,6 +41,12 @@ module Leankit
       format(get("io/card/#{card[:id]}/tasks"))[:cards]
     end
 
+    def events(card)
+      return [] unless card.is_a?(Hash)
+
+      format(get("io/card/#{card[:id]}/activity"))[:events]
+    end
+
     private
 
     def format(value)

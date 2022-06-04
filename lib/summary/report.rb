@@ -116,8 +116,12 @@ module Summary
 
     def create_cards_array(lane)
       threaded_cards(lane)
-        .sort_by { |hash| hash[:weeks_stale] }
-        .reverse
+        .sort_by do |hash|
+          (
+            hash[:development_weeks] ||
+              hash[:weeks_stale]
+          ) * -1
+        end
     end
 
     def threaded_cards(lane)
@@ -138,6 +142,7 @@ module Summary
         assignees: card[:assignedUsers].pluck(:fullName).join(', '),
         tasks: create_tasks_array(card),
         weeks_stale: weeks_stale(card),
+        development_weeks: development_weeks(card),
         pull_request: pull_request(card)
       }
     end
@@ -192,6 +197,30 @@ module Summary
 
       now = Time.now
       last_moved = Time.parse(card[:movedOn])
+
+      (now - last_moved).seconds.in_weeks.to_i
+    end
+
+    def development_weeks(card)
+      return unless Config.get(:development_lane).presence
+
+      event =
+        Leankit::Api.events(card)
+          .reverse
+          .detect do |item|
+            item[:type] == 'cardMoved' &&
+              Config.get(:development_lane).in?(
+                [
+                  item[:data][:toLane][:id],
+                  item[:data][:toLane][:name]
+                ]
+              )
+          end
+
+      return 0 unless event.present?
+
+      now = Time.now
+      last_moved = Time.parse(event[:timestamp])
 
       (now - last_moved).seconds.in_weeks.to_i
     end
