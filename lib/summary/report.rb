@@ -95,15 +95,15 @@ module Summary
 
     def create_lanes_array(board)
       lanes = Leankit::Api.lanes(board)
-      threads = []
+      thread_manager = ThreadManager.new
 
-      logger.group_start("Processing lanes: #{lanes.pluck(:name).join(', ')}")
+      thread_manager.before_perform = lambda do
+        logger.group_start("Processing lanes: #{lanes.pluck(:name).join(', ')}")
+      end
 
-      lanes.each { |lane| threads << Thread.new { create_lane_hash(lane) } }
+      thread_manager.after_perform = -> { logger.group_end }
 
-      logger.group_end
-
-      threads.map { |thread| thread.join && thread.value }
+      thread_manager.perform(lanes) { |lane| create_lane_hash(lane) }
     end
 
     def create_lane_hash(lane)
@@ -115,11 +115,18 @@ module Summary
     end
 
     def create_cards_array(lane)
-      Leankit::Api.cards(lane)
-        .map { |card| create_log_entry(card) }
-        .map { |card| create_hash(card, :card) }
+      threaded_cards(lane)
         .sort_by { |hash| hash[:weeks_stale] }
         .reverse
+    end
+
+    def threaded_cards(lane)
+      ThreadManager.perform(
+        Leankit::Api.cards(lane)
+      ) do |card|
+        create_log_entry(card)
+        create_hash(card, :card)
+      end
     end
 
     def create_card_hash(card)
@@ -138,11 +145,18 @@ module Summary
     def create_tasks_array(card)
       return [] unless Config.get(:include_task_cards).presence
 
-      Leankit::Api.tasks(card)
-        .map { |task| create_log_entry(task) }
-        .map { |task| create_hash(task, :task) }
+      threaded_tasks(card)
         .sort_by { |hash| [hash[:status][:order], hash[:weeks_stale], hash[:movedOn]] }
         .reverse
+    end
+
+    def threaded_tasks(card)
+      ThreadManager.perform(
+        Leankit::Api.tasks(card)
+      ) do |task|
+        create_log_entry(task)
+        create_hash(task, :task)
+      end
     end
 
     def create_task_hash(task)
