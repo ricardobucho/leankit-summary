@@ -2,7 +2,7 @@
 
 Generate summary reports for LeanKit boards.
 
-![Preview](https://github.com/ricardobucho/leankit-summary/blob/main/html-report-preview.png?raw=true)
+![Preview](https://github.com/ricardobucho/leankit-summary/blob/main/evolved-report-preview.png?raw=true)
 
 ## Requirements
 
