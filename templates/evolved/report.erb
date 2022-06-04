@@ -391,7 +391,7 @@
   <script>
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
 
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    var tooltipList = tooltipTriggerList.map((tooltipTriggerEl) => {
       return new bootstrap.Tooltip(tooltipTriggerEl)
     });
 
@@ -419,13 +419,13 @@
 
     function enableSearching() {
       $search = document.querySelectorAll('#search')[0];
-      $search.addEventListener('keyup', function (e) {
+      $search.addEventListener('keyup', (event) => {
         let $cards = document.querySelectorAll('.card-row');
-        let search = e.target.value.toLowerCase();
+        let search = event.target.value.toLowerCase();
 
-        $cards.forEach(function (card) {
+        $cards.forEach((card) => {
           let searchableWords = Array.from(card.querySelectorAll('td')).map(
-            function (td) {
+            (td) => {
               return td.innerText.toLowerCase();
             }
           ).join(' ');
@@ -445,50 +445,53 @@
   </script>
 
   <script>
-    $reportTable = document.querySelectorAll('.report')[0];
-    $sortableColumns = $reportTable.querySelectorAll('th[data-sortable]');
+    $reportTables = document.querySelectorAll('.report');
 
-    $sortableColumns.forEach(function ($column) {
-      $column.addEventListener('click', function (e) {
-        let $sortableColumn = e.target;
-        let $sortableColumnsRows = $reportTable.querySelectorAll('tbody > tr.card-row');
-        let $sortableColumnsRowsArray = Array.from($sortableColumnsRows);
+    Array.from($reportTables).forEach(($reportTable) => {
+      $sortableColumns = $reportTable.querySelectorAll('th[data-sortable]');
 
-        let currentSortableDirection = $sortableColumn.dataset.sortable;
+      $sortableColumns.forEach(($column) => {
+        $column.addEventListener('click', (event) => {
+          let $sortableColumn = event.target;
+          let $sortableColumnsRows = $reportTable.querySelectorAll('tbody > tr.card-row');
+          let $sortableColumnsRowsArray = Array.from($sortableColumnsRows);
 
-        let $sortableColumnsRowsArraySorted = $sortableColumnsRowsArray.sort(
-          function (a, b) {
-            let $a = parseInt(a.querySelectorAll('td')[$sortableColumn.cellIndex].innerText);
-            let $b = parseInt(b.querySelectorAll('td')[$sortableColumn.cellIndex].innerText);
+          let currentSortableDirection = $sortableColumn.dataset.sortable;
 
-            if (currentSortableDirection === 'desc') {
-              if ($a > $b) {
-                return 1;
-              } else if ($a < $b) {
-                return -1;
+          let $sortableColumnsRowsArraySorted = $sortableColumnsRowsArray.sort(
+            (a, b) => {
+              let $a = parseInt(a.querySelectorAll('td')[$sortableColumn.cellIndex].innerText);
+              let $b = parseInt(b.querySelectorAll('td')[$sortableColumn.cellIndex].innerText);
+
+              if (currentSortableDirection === 'desc') {
+                if ($a > $b) {
+                  return 1;
+                } else if ($a < $b) {
+                  return -1;
+                } else {
+                  return 0;
+                }
               } else {
-                return 0;
-              }
-            } else {
-              if ($a > $b) {
-                return -1;
-              } else if ($a < $b) {
-                return 1;
-              } else {
-                return 0;
+                if ($a > $b) {
+                  return -1;
+                } else if ($a < $b) {
+                  return 1;
+                } else {
+                  return 0;
+                }
               }
             }
-          }
-        );
+          );
 
-        $sortableColumns.forEach(function ($column) {
-          $column.dataset.sortable = 'asc';
-        });
+          $sortableColumns.forEach(($column) => {
+            $column.dataset.sortable = 'asc';
+          });
 
-        $sortableColumn.dataset.sortable = currentSortableDirection === 'asc' ? 'desc' : 'asc';
+          $sortableColumn.dataset.sortable = currentSortableDirection === 'asc' ? 'desc' : 'asc';
 
-        $sortableColumnsRowsArraySorted.forEach(function ($row) {
-          $row.parentNode.appendChild($row);
+          $sortableColumnsRowsArraySorted.forEach(($row) => {
+            $row.parentNode.appendChild($row);
+          });
         });
       });
     });
