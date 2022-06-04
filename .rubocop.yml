@@ -22,7 +22,7 @@ Style/Documentation:
   Enabled: false
 
 Metrics/ClassLength:
-  Max: 200
+  Max: 250
 
 Layout/MultilineMethodCallIndentation:
   Enabled: false

@@ -15,6 +15,7 @@ Config.set do |config|
   config[:api_token] = ENV['LK_API_TOKEN'].squish
   config[:board_id] = ENV['LK_BOARD_ID'].squish
   config[:lanes] = ENV['LK_LANES'].split(';').map(&:squish)
+  config[:development_lane] = ENV['LK_DEVELOPMENT_LANE'].squish
 
   config[:github_api_base_url] = ENV['GH_API_BASE_URL'].squish
   config[:github_token] = ENV['GH_PERSONAL_TOKEN'].squish
