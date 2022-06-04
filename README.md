@@ -20,6 +20,7 @@ Generate summary reports for LeanKit boards.
 * `LK_API_TOKEN`: A LeanKit API token (see below how to get one)
 * `LK_BOARD_ID`: The id of the board intended for the reports
 * `LK_LANES`: The lanes of the board intended for the reports split by `;`
+* `LK_DEVELOPMENT_LANE`: Optional; The lane used to calculate the development time
 * `GH_API_BASE_URL`: The base URL for the GitHub API
 * `GH_PERSONAL_TOKEN`: A GitHub Personal Token (see below how to get one)
 * `GH_REPOSITORY`: The repository where to search for pull requests in the `owner/repo` format
